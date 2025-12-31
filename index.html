@@ -83,6 +83,12 @@
             color: #e74c3c;
         }
 
+        .form-group label .hint {
+            font-size: 0.85em;
+            color: #888;
+            font-weight: normal;
+        }
+
         .form-group input,
         .form-group select,
         .form-group textarea {
@@ -475,7 +481,7 @@
                 <h3>👤 Staff Information</h3>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Staff Name <span class="required">*</span></label>
+                        <label>Staff Name <span class="hint">(same as NRIC)</span> <span class="required">*</span></label>
                         <input type="text" id="staffName" name="staffName" required placeholder="Enter your full name">
                     </div>
                     <div class="form-group">
@@ -488,11 +494,12 @@
                         <label>Department <span class="required">*</span></label>
                         <select id="department" name="department" required>
                             <option value="">-- Select Department --</option>
-                            <option value="Agency / Operations / Boarding">Agency / Operations / Boarding</option>
-                            <option value="Account & HR Department">Account & HR Department</option>
+                            <option value="Agency Ops (Vessel Related)">Agency Ops (Vessel Related)</option>
+                            <option value="Agency Ops (Non-Vessel Related)">Agency Ops (Non-Vessel Related)</option>
+                            <option value="Boarding Team">Boarding Team</option>
+                            <option value="Chartering Team">Chartering Team</option>
                             <option value="Ocean Carriers">Ocean Carriers</option>
-                            <option value="Singunion Chartering">Singunion Chartering</option>
-                            <option value="Singunion Shipping">Singunion Shipping</option>
+                            <option value="Account / Admin">Account / Admin</option>
                         </select>
                     </div>
                 </div>
@@ -514,7 +521,7 @@
                         <thead>
                             <tr>
                                 <th style="width: 50px;">S/N</th>
-                                <th style="width: 180px;">TYPE OF CLAIMS</th>
+                                <th style="width: 220px;">TYPE OF CLAIMS</th>
                                 <th style="width: 120px;">AMOUNT (SGD)</th>
                                 <th>REMARKS</th>
                                 <th style="width: 150px;">RECEIPT</th>
@@ -567,12 +574,23 @@
         // Configuration - UPDATE THIS URL AFTER SETTING UP N8N WEBHOOK
         const WEBHOOK_URL = 'https://ctlee0712.app.n8n.cloud/webhook/claims-submit';
 
-        // Claim types
+        // Claim types - UPDATED
         const claimTypes = [
-            'Transport / Taxi',
-            'Meals / Entertainment',
-            'Phone / Mobile',
-            'Office Supplies'
+            'TELEPHONE & TELEX',
+            'VESSEL RELATED EXPENSES',
+            'TRANSPORTATION EXPENSES (EG: TAXI FARE)',
+            'PARKING / CASH CARD',
+            'PRINTING & STATIONERY',
+            'STAMP, POSTAGE & COURIER',
+            'STAFF REFRESHMENT',
+            'ENTERTAINMENT',
+            'MEDICAL FEE',
+            'SUBSCRIPTION FEE',
+            'EXPENSES VEHICLE - SNE5006J',
+            'STAFF WELFARE',
+            'STAFF TRAINING',
+            'FESTIVAL EXPENSES',
+            'GENERAL / OTHERS EXPENSES'
         ];
 
         // Initialize
@@ -583,25 +601,34 @@
             addRow(); // Add third row
         });
 
-        // Generate month checkboxes (current year and next year)
+        // Generate month checkboxes (Dec 2025 to Dec 2026)
         function generateMonthCheckboxes() {
             const container = document.getElementById('monthCheckboxes');
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             const currentDate = new Date();
-            const currentYear = currentDate.getFullYear();
             
-            // Show last 6 months + current month + next 5 months
+            // Fixed range: Dec 2025 to Dec 2026
             let html = '';
-            for (let i = -6; i <= 5; i++) {
-                const date = new Date(currentYear, currentDate.getMonth() + i, 1);
-                const monthYear = `${months[date.getMonth()]} ${date.getFullYear()}`;
-                const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                const isCurrentMonth = i === 0;
+            
+            // Dec 2025
+            html += `
+                <label>
+                    <input type="checkbox" name="months" value="2025-12">
+                    <span>Dec 2025</span>
+                </label>
+            `;
+            
+            // Jan 2026 to Dec 2026
+            for (let month = 0; month <= 11; month++) {
+                const monthName = months[month];
+                const value = `2026-${String(month + 1).padStart(2, '0')}`;
+                const isCurrentMonth = (currentDate.getFullYear() === 2026 && currentDate.getMonth() === month) || 
+                                       (currentDate.getFullYear() === 2025 && currentDate.getMonth() === 11 && month === 0);
                 
                 html += `
                     <label>
                         <input type="checkbox" name="months" value="${value}" ${isCurrentMonth ? 'checked' : ''}>
-                        <span>${monthYear}</span>
+                        <span>${monthName} 2026</span>
                     </label>
                 `;
             }
